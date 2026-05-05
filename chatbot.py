@@ -45,13 +45,14 @@ def learn_from_message(msg):
     # Envoi vers ta mémoire centrale via Ngrok (sécurisé)
     try:
         requests.post(
-            "https://lisana-production.up.railway.app/api/memory",
-            json={
-                "key": os.getenv("MEMORY_KEY"),
-                "message": msg
-            },
-            timeout=2
-        )
+    "https://lisana-production.up.railway.app/api/memory",
+    json={
+        "key": os.getenv("MEMORY_KEY"),
+        "message": msg
+    },
+    timeout=2
+)
+
     except:
         pass
 
