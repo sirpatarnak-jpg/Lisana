@@ -47,7 +47,7 @@ def learn_from_message(msg):
         requests.post(
             "https://lisana-production.up.railway.app/api/memory",
             json={
-                "key": "MA_SUPER_CLE_938472",
+                "key": os.getenv("MEMORY_KEY"),
                 "message": msg
             },
             timeout=2
@@ -365,7 +365,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-TOKEN = os.getenv("MEMORY_KEY")
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 if not TOKEN:
     raise RuntimeError("La variable d’environnement DISCORD_TOKEN n’est pas définie.")
