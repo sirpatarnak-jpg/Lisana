@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-app = FastAPI()
 import json
 import os
 
-MEMORY_FILE = "memory.json"
-SECRET_KEY = "Bink1n514819"  # ← mets ta clé ici
-
 app = FastAPI()
+
+MEMORY_FILE = "memory.json"
+SECRET_KEY = "Bink1n514819"
 
 def load_memory():
     if not os.path.exists(MEMORY_FILE):
@@ -21,9 +20,8 @@ def save_memory(memory):
     with open(MEMORY_FILE, "w", encoding="utf-8") as f:
         json.dump(memory, f, ensure_ascii=False, indent=2)
 
-@app.post("/add_memory")
+@app.post("/api/memory")
 async def add_memory(data: dict):
-    # Vérification de la clé secrète
     if data.get("key") != SECRET_KEY:
         return {"status": "error", "reason": "unauthorized"}
 
