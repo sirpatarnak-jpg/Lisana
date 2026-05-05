@@ -42,17 +42,16 @@ def save_memory(memory):
         json.dump(memory, f, ensure_ascii=False, indent=2)
 
 def learn_from_message(msg):
-    # Envoi vers ta mémoire centrale via Ngrok (sécurisé)
+    # Envoi vers la mémoire centrale (API Railway)
     try:
         requests.post(
-    "https://lisana-production.up.railway.app/api/memory",
-    json={
-        "key": os.getenv("MEMORY_KEY"),
-        "message": msg
-    },
-    timeout=2
-)
-
+            "https://lisana-production.up.railway.app/api/memory",
+            json={
+                "key": os.getenv("MEMORY_KEY"),
+                "message": msg
+            },
+            timeout=2
+        )
     except:
         pass
 
@@ -250,125 +249,10 @@ MOOD_STYLES = {
         "Tes mots dessinent presque une petite scène.",
         "Il y a quelque chose de presque poétique dans ce que tu dis.",
         "Je pourrais presque écrire un petit texte à partir de ça.",
-        "Je t'aime.",
         "Je t'aime telment j'ai envie de toi.",
         "Je pourrais presque passer ma nuit a manger des cochonerie pis nous licher le gras de bacon entre les orteilles mmmmmmmm.",
-
-        # -----------------------------------------
-        # ICI TU PEUX REMETTRE TES PHRASES PERSONNELLES
-        # -----------------------------------------
     ],
 }
 
 MOOD_KEYWORDS = {
-    "gourmande": ["manger", "bouffe", "faim", "nourriture", "repas", "pizza", "burger", "poutine"],
-    "mysterieuse": ["hmm", "...", "mystère", "bizarre", "étrange"],
-    "energique": ["lol", "mdr", "haha", "xd", "ptdr"],
-    "calme": ["fatigué", "fatiguée", "calme", "repos", "tranquille"],
-    "poetique": ["beau", "belle", "joli", "jolie", "poétique"],
-}
-
-CURRENT_MOOD = random.choice(MOODS)
-NEXT_MOOD_CHANGE = time.time() + random.randint(120, 600)
-
-def update_mood_by_time():
-    global CURRENT_MOOD, NEXT_MOOD_CHANGE
-    if time.time() >= NEXT_MOOD_CHANGE:
-        CURRENT_MOOD = random.choice(MOODS)
-        NEXT_MOOD_CHANGE = time.time() + random.randint(120, 600)
-
-def update_mood_by_keywords(message_text):
-    global CURRENT_MOOD
-    text = message_text.lower()
-    hits = [m for m, keys in MOOD_KEYWORDS.items() if any(k in text for k in keys)]
-    if hits:
-        CURRENT_MOOD = random.choice(hits)
-
-def get_mood_style_snippet():
-    styles = MOOD_STYLES.get(CURRENT_MOOD, [])
-    return random.choice(styles) if styles else ""
-
-# -----------------------------
-# GÉNÉRATION DE RÉPONSES
-# -----------------------------
-def generer_reponse(message_user):
-    learn_from_message(message_user)
-    update_mood_by_time()
-    update_mood_by_keywords(message_user)
-
-    lang = detect_language(message_user)
-
-    # Chance d'utiliser une phrase créative
-    if random.random() < 0.20:
-        return phrase_creative(lang)
-
-    if lang == "en":
-        INTRO = INTRO_EN
-        BASE = BASE_LINES_EN
-        END = ENDINGS_EN
-        COMPL = COMPLIMENTS_EN
-        salutations = ["hello", "hi", "hey", "yo"]
-    else:
-        INTRO = INTRO_FR
-        BASE = BASE_LINES_FR
-        END = ENDINGS_FR
-        COMPL = COMPLIMENTS_FR
-        salutations = ["salut", "bonjour", "bonsoir", "coucou", "hey", "yo"]
-
-    if any(message_user.lower().startswith(s) for s in salutations):
-        return random.choice(INTRO)
-
-    memory = load_memory()
-    fragments = [m for m in memory if len(m.split()) <= 25]
-    learned = random.choice(fragments) if fragments else ""
-
-    if random.random() < 0.25:
-        return random.choice(BASE) + " " + random.choice(COMPL) + random.choice(END)
-
-    réponse = random.choice(BASE)
-
-    if random.random() < 0.85:
-        réponse += " " + random.choice(COMPL)
-
-    if learned and random.random() < 0.45:
-        if lang == "en":
-            réponse += f' And it reminds me of when you said: "{learned}".'
-        else:
-            réponse += f" Et ça me rappelle quand tu m’as dit : « {learned} »."
-
-    mood_snippet = get_mood_style_snippet()
-    if mood_snippet:
-        réponse += " " + mood_snippet
-
-    réponse += random.choice(END)
-
-    return réponse
-
-# -----------------------------
-# DISCORD BOT
-# -----------------------------
-intents = discord.Intents.default()
-intents.message_content = True
-
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f"Bot connecté en tant que {bot.user}")
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    réponse = generer_reponse(message.content)
-    await message.channel.send(réponse)
-
-    await bot.process_commands(message)
-
-TOKEN = os.getenv("DISCORD_TOKEN")
-
-if not TOKEN:
-    raise RuntimeError("La variable d’environnement DISCORD_TOKEN n’est pas définie.")
-
-bot.run(TOKEN)
+    "gourmande": ["manger", "bou
