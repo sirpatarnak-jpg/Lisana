@@ -7,14 +7,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-# Charger les variables du fichier .env
 load_dotenv()
 
 MEMORY_FILE = "memory.json"
 
-# -----------------------------
-# DÉTECTION DE LANGUE
-# -----------------------------
 def detect_language(text):
     text = text.lower()
     english_keywords = ["the", "you", "hello", "hi", "food", "love", "good", "bad", "why", "how"]
@@ -25,9 +21,6 @@ def detect_language(text):
 
     return "en" if eng_hits > fr_hits else "fr"
 
-# -----------------------------
-# MÉMOIRE LOCALE + API CENTRALE
-# -----------------------------
 def load_memory():
     if not os.path.exists(MEMORY_FILE):
         return []
@@ -61,9 +54,6 @@ def learn_from_message(msg):
     memory = memory[-5000:]
     save_memory(memory)
 
-# -----------------------------
-# MODULE DE CRÉATIVITÉ
-# -----------------------------
 PHRASE_START_FR = [
     "Tu sais…",
     "Je pensais à quelque chose…",
@@ -126,9 +116,6 @@ def phrase_creative(lang):
             random.choice(PHRASE_END_FR)
         )
 
-# -----------------------------
-# PERSONNALITÉ FR
-# -----------------------------
 INTRO_FR = [
     "Oh, salut… moi c’est Lisana. On dit que je suis douce, expressive… et complètement folle de bouffe.",
     "Bonjour à toi… je suis Lisana. Un mélange de chaleur, de mystère et d’une passion démesurée pour la nourriture.",
@@ -262,9 +249,6 @@ MOOD_KEYWORDS = {
     "poetique": ["beau", "belle", "joli", "jolie", "poétique"],
 }
 
-# -----------------------------
-# GÉNÉRATION DE RÉPONSES
-# -----------------------------
 def generer_reponse(message_user):
     learn_from_message(message_user)
     update_mood_by_time()
@@ -318,9 +302,6 @@ def generer_reponse(message_user):
 
     return réponse
 
-# -----------------------------
-# DISCORD BOT
-# -----------------------------
 intents = discord.Intents.default()
 intents.message_content = True
 
