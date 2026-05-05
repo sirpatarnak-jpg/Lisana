@@ -1,11 +1,16 @@
-from fastapi import FastAPI
-import json
 import os
+import json
+import asyncio
+from fastapi import FastAPI
+from discord.ext import commands
+import uvicorn
 
 app = FastAPI()
 
 MEMORY_FILE = "memory.json"
 SECRET_KEY = "Bink1n514819"
+
+bot = commands.Bot(command_prefix="!")
 
 def load_memory():
     if not os.path.exists(MEMORY_FILE):
@@ -35,3 +40,20 @@ async def add_memory(data: dict):
     save_memory(memory)
 
     return {"status": "ok", "stored": msg}
+
+async def start_bot():
+    await bot.start(os.getenv("DISCORD_TOKEN"))
+
+async def start_api():
+    config = uvicorn.Config(app, host="0.0.0.0", port=8080)
+    server = uvicorn.Server(config)
+    await server.serve()
+
+async def main():
+    await asyncio.gather(
+        start_api(),
+        start_bot()
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
