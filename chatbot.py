@@ -45,7 +45,7 @@ def learn_from_message(msg):
     # Envoi vers ta mémoire centrale via Ngrok (sécurisé)
     try:
         requests.post(
-            "https://reflector-hatless-daunting.ngrok-free.dev/add_memory",
+            "https://lisana-production.up.railway.app/api/memory",
             json={
                 "key": "MA_SUPER_CLE_938472",
                 "message": msg
