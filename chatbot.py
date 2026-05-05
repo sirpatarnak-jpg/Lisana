@@ -365,7 +365,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("MEMORY_KEY")
 
 if not TOKEN:
     raise RuntimeError("La variable d’environnement DISCORD_TOKEN n’est pas définie.")
