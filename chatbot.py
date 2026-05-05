@@ -255,4 +255,93 @@ MOOD_STYLES = {
 }
 
 MOOD_KEYWORDS = {
-    "gourmande": ["manger", "bou
+    "gourmande": ["manger", "bouffe", "faim", "nourriture", "repas", "pizza", "burger", "poutine"],
+    "mysterieuse": ["hmm", "...", "mystère", "bizarre", "étrange"],
+    "energique": ["lol", "mdr", "haha", "xd", "ptdr"],
+    "calme": ["fatigué", "fatiguée", "calme", "repos", "tranquille"],
+    "poetique": ["beau", "belle", "joli", "jolie", "poétique"],
+}
+
+# -----------------------------
+# GÉNÉRATION DE RÉPONSES
+# -----------------------------
+def generer_reponse(message_user):
+    learn_from_message(message_user)
+    update_mood_by_time()
+    update_mood_by_keywords(message_user)
+
+    lang = detect_language(message_user)
+
+    # Chance d'utiliser une phrase créative
+    if random.random() < 0.20:
+        return phrase_creative(lang)
+
+    if lang == "en":
+        INTRO = INTRO_EN
+        BASE = BASE_LINES_EN
+        END = ENDINGS_EN
+        COMPL = COMPLIMENTS_EN
+        salutations = ["hello", "hi", "hey", "yo"]
+    else:
+        INTRO = INTRO_FR
+        BASE = BASE_LINES_FR
+        END = ENDINGS_FR
+        COMPL = COMPLIMENTS_FR
+        salutations = ["salut", "bonjour", "bonsoir", "coucou", "hey", "yo"]
+
+    if any(message_user.lower().startswith(s) for s in salutations):
+        return random.choice(INTRO)
+
+    memory = load_memory()
+    fragments = [m for m in memory if len(m.split()) <= 25]
+    learned = random.choice(fragments) if fragments else ""
+
+    if random.random() < 0.25:
+        return random.choice(BASE) + " " + random.choice(COMPL) + random.choice(END)
+
+    réponse = random.choice(BASE)
+
+    if random.random() < 0.85:
+        réponse += " " + random.choice(COMPL)
+
+    if learned and random.random() < 0.45:
+        if lang == "en":
+            réponse += f' And it reminds me of when you said: "{learned}".'
+        else:
+            réponse += f" Et ça me rappelle quand tu m’as dit : « {learned} »."
+
+    mood_snippet = get_mood_style_snippet()
+    if mood_snippet:
+        réponse += " " + mood_snippet
+
+    réponse += random.choice(END)
+
+    return réponse
+
+# -----------------------------
+# DISCORD BOT
+# -----------------------------
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f"Bot connecté en tant que {bot.user}")
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+            réponse = generer_reponse(message.content)
+    await message.channel.send(réponse)
+
+    await bot.process_commands(message)
+
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if not TOKEN:
+    raise RuntimeError("La variable d’environnement DISCORD_TOKEN n’est pas définie.")
+
+bot.run(TOKEN)
